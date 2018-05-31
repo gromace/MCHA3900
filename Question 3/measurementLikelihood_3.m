@@ -38,8 +38,8 @@ modelType = 'ternary';
 switch modelType
     case 'ternary'          
         P_is	= 0.4;
-        P_pl	= 0.2;
-        P_null	= 0.4; 
+        P_pl	= 0.3;
+        P_null	= 0.3; 
     otherwise
         error('Invalid mode');
 end
