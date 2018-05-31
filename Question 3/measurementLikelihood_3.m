@@ -49,6 +49,7 @@ assert(P_is + P_pl  + P_null == 1, 'Prior probabilities must sum to 1');
 theta = [sigma_cex_is;sigma_cex_pl;P_is;P_pl;P_null];
 
 %% Automatic parameter tuning
+% Pack parameters (Initial guess)
 p.thetacb= [atan2(-rHCc_norm(3,1),sqrt((rHCc_norm(1,1))^2+(rHCc_norm(2,1))^2));atan2(rHCc_norm(2,1),rHCc_norm(1,1));0];
 p.thetanb= [0;0;0];
 p.vCBb= ones(3,1);
