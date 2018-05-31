@@ -23,6 +23,7 @@ param.k = length(imageFileNamesUsed);
 % Initial image pose and pixel to vector grid
 load('Initial_image_pose.mat')
 load('pixelToVector_lerp_grid.mat');
+load('pixelToVector_nlerp_grid.mat');
 load('calibration_sample_vector_points.mat')
 
 Ach_est(:,:,1) = Ach_init_est;
@@ -38,9 +39,9 @@ A = [repmat([ones(1,9),inf*ones(1,3)],1,param.k);
 B = deg2rad([190;-190]);
 
 options = optimoptions(@fmincon,'MaxFunctionEvaluations',1e6,'Algorithm','sqp', 'PlotFcn',...
-                       'optimplotfval','OptimalityTolerance',1e-10,'MaxIterations',inf); 
-out = fmincon(@(intc) px2vec2(intc, worldPoints, imagePoints, param.k, Fx, Fy, Fz), intc,...
-                               [], [], [], [], [], [], @norm_vect, options);
+                       'optimplotfval','OptimalityTolerance',1e-6,'MaxIterations',inf); 
+[out, fval, foutput] = fmincon(@(intc) px2vec2(intc, worldPoints, imagePoints, param.k, Fx_norm, Fy_norm, Fz_norm), intc,...
+                               [], [], [], [], [], [], [], options);
 waitbar(0.75,param.wh); % Update waitbar
 
 % Compute the optimised vectors and pose
@@ -96,17 +97,14 @@ ylabel('c2 (unit)','FontSize',fs)
 zlabel('c3 (unit)','FontSize',fs)
 grid on
 
-% figure('Name',['Calibration Image ',num2str(im_num)],'NumberTitle','off');clf
-figure(46);clf
-imshow(imageFileNames(:,:,:,im_num))
 
-%% Nonlincon
+%% Nonlincon: Constrain the 3 coordinate values to a unit vector
 function [c,ceq] = norm_vect(intc)
 global param
 
 c=[];
-
 for l=1:param.k
     ceq(12*l-2 : 12*l) = 1 - sqrt(intc(12*l-2).^2 + intc(12*l-1).^2 + intc(12*l).^2);
 end
+
 end

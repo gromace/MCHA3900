@@ -2,7 +2,7 @@ function [err, ustar, ucn, Ach] = px2vec2(in, O, imagePoints, num_images, Fx, Fy
 % Constant World points on checkerboard
 rHCh = [O';zeros(1,length(O))];
 
-ucn_1 = zeros(35,3);
+% Initialise all the matrices to be filled
 ustar = zeros(35,3);
 uc = zeros(35,3,num_images);
 ucn = zeros(length(O),3,length(num_images));
@@ -22,15 +22,14 @@ for k = 1:num_images
     fz = Fz(imagePoints(:,2,k),imagePoints(:,1,k));
 
     % Vectorize
-    uc(:,:,k) = [-fx,fy,fz];
-
-    % Normalise the sucker... I mean vector
-    uc_norm = sqrt(fx(:).^2 + fy(:).^2 + fz(:).^2);
-
-    ucn(:,:,k) = [uc(:,1)./uc_norm, uc(:,2)./uc_norm, uc(:,3)./uc_norm];                     % 35 x 3
+%     uc(:,:,k) = [-fx,fy,fz];
+    ucn(:,:,k) = [-fx,fy,fz];
     
-    ucn_1 = ucn_1 + ucn(:,:,k);
+    % Normalise 
+%     uc_norm = sqrt(fx(:).^2 + fy(:).^2 + fz(:).^2);
+%     ucn(:,:,k) = [uc(:,1)./uc_norm, uc(:,2)./uc_norm, uc(:,3)./uc_norm];                     % 35 x 3
     
+    % Rotation and direction vector in camera coordinates
     Rch(:,:,k)  = [in(12*(k)-11 : 12*(k)-9), in(12*(k)-8 : 12*(k) - 6),in(12*(k)-5 : 12*(k)-3)];
     rHCc(:,:,k)  = in(12*(k)-2 : 12*(k));
 
@@ -48,13 +47,13 @@ for k = 1:num_images
         d(i,k) = 1 - ucn(i,:,k) * rQCc(:,i,k);      
     end
 
-    ustar = ustar + uc(:,:,k);
+    ustar = ustar + ucn(:,:,k);
 end
 
 % NOTE: not sure about the error part here
 err_p = sum(d, 2);
 % err = sum(err_p, 1);
 
-err = lsqr(sum(ustar, 2),err_p);
+err = abs(lsqr(sum(ustar, 2),err_p));
 
 end

@@ -14,19 +14,19 @@ u = start:xstep:finish-1;
 v = start:ystep:finish-1;
 
 %% Sort selected image points into a grid
-rx = ones(ImageGridRow,ImageGridCol);
-ry = ones(ImageGridRow,ImageGridCol);
-rz = ones(ImageGridRow,ImageGridCol);
+ucx = ones(ImageGridRow,ImageGridCol);
+ucy = ones(ImageGridRow,ImageGridCol);
+ucz = ones(ImageGridRow,ImageGridCol);
 
 for i=1:ImageGridRow
     for j=1:ImageGridCol
-        rx(i,j) = ustar(1,i + ImageGridRow * (j - 1));
-        ry(i,j) = ustar(2,i + ImageGridRow * (j - 1));
-        rz(i,j) = ustar(3,i + ImageGridRow * (j - 1));
+        ucx(i,j) = ustar(1,i + ImageGridRow * (j - 1));
+        ucy(i,j) = ustar(2,i + ImageGridRow * (j - 1));
+        ucz(i,j) = ustar(3,i + ImageGridRow * (j - 1));
     end
 end
 
 %% Interpolant between surfaces (lerp): pixel to vector
-Fxstar = griddedInterpolant({u,v},rx,'linear','nearest');
-Fystar = griddedInterpolant({u,v},ry,'linear','nearest');
-Fzstar = griddedInterpolant({u,v},rz,'linear','nearest');
+Fxstar = griddedInterpolant({u,v},ucx,'linear','nearest');
+Fystar = griddedInterpolant({u,v},ucy,'linear','nearest');
+Fzstar = griddedInterpolant({u,v},ucz,'linear','nearest');
