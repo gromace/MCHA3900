@@ -12,8 +12,9 @@ param.wh = waitbar(0,getMsg, ...
 % Find checkerboard corners
 % CheckerboardDetection();
 CheckerboardDetectionVideo();
+
 waitbar(0.25,param.wh); % Update waitbar
-im_num = 2;
+im_num = 2;             % Select frame to plot
 
 fs = 20;
 % worldPoints(:,:) = worldPoints(:,:)*1e-3;
@@ -49,7 +50,7 @@ waitbar(0.75,param.wh); % Update waitbar
 ustar = ustar./param.k;
 disp(['simulation run time: ',num2str(toc/60),' mins'])
 
-%% Update grid with optimised Uij values
+%% Update grid with optimised Uij* values
 [Fxstar, Fystar, Fzstar] = updateGrid(ustar');
 save('optimized_pixelToVector_lerp_grid.mat','Fxstar', 'Fystar', 'Fzstar');
 

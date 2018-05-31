@@ -38,15 +38,17 @@ for k = 1:num_images
 
     rbPCc(:,:,k) = Ach(:,:,k)*[rHCh;ones(1,length(O))];
     rPCc(:,:,k) = rbPCc(1:3,:,k);
-
+    
+    % Normalise predicted vectors
     norm_rPCc = sqrt(rPCc(1,:,k).^2 + rPCc(2,:,k).^2 + rPCc(3,:,k).^2);
     rQCc(:,:,k) = [rPCc(1,:,k)./norm_rPCc; rPCc(2,:,k)./norm_rPCc; rPCc(3,:,k)./norm_rPCc];        % 3 x 35
     
-
+    % Compute angular error
     for i=1:length(O)
         d(i,k) = 1 - ucn(i,:,k) * rQCc(:,i,k);      
     end
-
+    
+    % Update map
     ustar = ustar + ucn(:,:,k);
 end
 

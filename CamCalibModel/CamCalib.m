@@ -13,18 +13,16 @@ CheckerboardDetection();
 % waitbar(0.25, wh); % Update waitbar
 
 % Image number
-param.n = 14;
+param.n = 1;
 fs = 15;
 
 figure(4567);clf
 imshow(imageFileNames{param.n})
 
-% convert from mm to m
-worldPoints(:,:) = worldPoints(:,:)*1e-3;
-
 %% Parameters
 param.p2m = 4.8e-6;
 
+% Initial angles to rotate matrices
 qtransform = deg2rad([90;-90;90]);
 
 % centre roguhly for image 1 in NED coords
@@ -50,33 +48,12 @@ for i = 1:length(worldPoints)
     rHCc(:,i) = Ach(1:3,4);
     Rch = Ach(1:3,1:3);
     
+    % Normalised pose
     rHCc_norm(:,i) = Ach_norm(1:3,4);
 %     rHCc(1,i) = -rHCc(1,i);
     pose = Rch*rHCc;
     waitbar(0.25+0.25*(i/length(worldPoints)),wh); % Update waitbar
 end
-
-%% Pixel to Vector
-rHCc_est_dat = load('calibration_sample_vector_points.mat');
-[uc, ucn] = px2vecest(rHCc_est_dat.rHCc, imagePoints, param.n);
-
-% optimization for vector and pose
-Ach11 = [Rch,rHCc(:,1);zeros(1,3),1];
-intc = [Ach11(1:3,1);Ach11(1:3,2);Ach11(1:3,3);Ach11(1:3,4)];
-[rHCc_est, Ach_est] = AutotuneParameters1(intc, worldPoints, ucn);
-% 
-% load('pixelToVector_lerp_grid.mat');
-% for j = 1:15
-%     [uc, ucn] = px2vecest(rHCc_est_dat.rHCc, imagePoints, j);
-%     [rQCc_est, Ach_est] = AutotuneParameters2(intc, worldPoints, ucn);
-% 
-%     waitbar(0.5+0.5*(j/15),wh); % Update waitbar
-% end
-
-%% Vector to pixel
-
-% 1. invert pixeltoVector 
-% 2. Build Another LUT
 
 %% How's the waitbar going bois?
 try 
