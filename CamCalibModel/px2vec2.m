@@ -22,12 +22,12 @@ for k = 1:num_images
     fz = Fz(imagePoints(:,2,k),imagePoints(:,1,k));
 
     % Vectorize
-%     uc(:,:,k) = [-fx,fy,fz];
-    ucn(:,:,k) = [-fx,fy,fz];
+    uc(:,:,k) = [-fx,fy,fz];
+%     ucn(:,:,k) = [-fx,fy,fz];
     
     % Normalise 
-%     uc_norm = sqrt(fx(:).^2 + fy(:).^2 + fz(:).^2);
-%     ucn(:,:,k) = [uc(:,1)./uc_norm, uc(:,2)./uc_norm, uc(:,3)./uc_norm];                     % 35 x 3
+    uc_norm = sqrt(fx(:).^2 + fy(:).^2 + fz(:).^2);
+    ucn(:,:,k) = [uc(:,1)./uc_norm, uc(:,2)./uc_norm, uc(:,3)./uc_norm];                     % 35 x 3
     
     % Rotation and direction vector in camera coordinates
     Rch(:,:,k)  = [in(12*(k)-11 : 12*(k)-9), in(12*(k)-8 : 12*(k) - 6),in(12*(k)-5 : 12*(k)-3)];

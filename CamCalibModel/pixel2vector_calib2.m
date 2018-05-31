@@ -10,8 +10,8 @@ param.wh = waitbar(0,getMsg, ...
     'CreateCancelBtn', 'setappdata(gcbf,''cancelling'',1)');
 %% Calibration
 % Find checkerboard corners
-CheckerboardDetection();
-% CheckerboardDetectionVideo();
+% CheckerboardDetection();
+CheckerboardDetectionVideo();
 waitbar(0.25,param.wh); % Update waitbar
 im_num = 2;
 
@@ -97,14 +97,5 @@ ylabel('c2 (unit)','FontSize',fs)
 zlabel('c3 (unit)','FontSize',fs)
 grid on
 
-
-%% Nonlincon: Constrain the 3 coordinate values to a unit vector
-function [c,ceq] = norm_vect(intc)
-global param
-
-c=[];
-for l=1:param.k
-    ceq(12*l-2 : 12*l) = 1 - sqrt(intc(12*l-2).^2 + intc(12*l-1).^2 + intc(12*l).^2);
-end
-
-end
+figure(46);clf
+imshow(imageFileNames(:,:,:,2))
