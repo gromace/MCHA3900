@@ -10,8 +10,8 @@ param.wh = waitbar(0,getMsg, ...
     'CreateCancelBtn', 'setappdata(gcbf,''cancelling'',1)');
 %% Calibration
 % Find checkerboard corners
-% CheckerboardDetection();
-CheckerboardDetectionVideo();
+CheckerboardDetection();
+% CheckerboardDetectionVideo();
 waitbar(0.25,param.wh); % Update waitbar
 im_num = 2;
 
@@ -38,7 +38,7 @@ A = [repmat([ones(1,9),inf*ones(1,3)],1,param.k);
 B = deg2rad([190;-190]);
 
 options = optimoptions(@fmincon,'MaxFunctionEvaluations',1e6,'Algorithm','sqp', 'PlotFcn',...
-                       'optimplotfval','OptimalityTolerance',1e-10,'MaxIterations',200); 
+                       'optimplotfval','OptimalityTolerance',1e-10,'MaxIterations',inf); 
 out = fmincon(@(intc) px2vec2(intc, worldPoints, imagePoints, param.k, Fx, Fy, Fz), intc,...
                                [], [], [], [], [], [], @norm_vect, options);
 waitbar(0.75,param.wh); % Update waitbar
@@ -47,6 +47,10 @@ waitbar(0.75,param.wh); % Update waitbar
 [~, ustar, ucn, Ach] = px2vec2(out, worldPoints, imagePoints, param.k, Fx, Fy, Fz);
 ustar = ustar./param.k;
 disp(['simulation run time: ',num2str(toc/60),' mins'])
+
+%% Update grid with optimised Uij values
+[Fxstar, Fystar, Fzstar] = updateGrid(ustar');
+save('optimized_pixelToVector_lerp_grid.mat','Fxstar', 'Fystar', 'Fzstar');
 
 %% How's the waitbar going bois?
 try 
