@@ -16,7 +16,7 @@ P_null       = x(5);
 % Data likelihoods [dB]
 lik_dB_cex_is   = normalEvidence(p.vec1, p.mu_cex_is, sigma_cex_is);
 lik_dB_cex_pl   = normalEvidence(p.vec2, p.mu_cex_pl, sigma_cex_pl);
-lik_dB_cex_null = uniformEvidence(p.vec1, p.min, p.max);
+lik_dB_cex_null = uniformEvidence(p.vec2, p.min, p.max);
 
 
 %% Evaluate posterior evidence for each hypothesis

@@ -5,28 +5,28 @@
 clear all
 %% Load Data
 % Vector Test Data
-load('Initial_image_pose.mat') %Use for POSE? 
+load('Initial_image_pose.mat') %Use for POSE just for random data? 
 %POSE=[N E D; theta phi psi; dtheta dphi dpsi];
 
 load('calibration_sample_vector_points.mat')
 
 
 p.vec1 = rHCc_norm(:,1);
-p.vec2 = rHCc_norm(:,1);
+p.vec2 = rHCc_norm(:,2);
 
 
-% Lookup idle and part-load exhaust cam maps [deg BTDC] for each time step
+% Set mu for each case
 p.mu_cex_is = mean2(p.vec1);
 p.mu_cex_pl = mean2(p.vec2);
-p.min=-15;
-p.max=15;
+p.min=-1;
+p.max=1;
 
 %% Tuning parameters
 
 % Standard deviation of measurement likelihood
 
-sigma_cex_is = 0.1;  % stdev of exhaust cam phase uncertainty
-sigma_cex_pl=0.5;
+sigma_cex_is = 0.5;  %
+sigma_cex_pl = 0.5;
 
 
 % Uncomment one model type below
@@ -37,9 +37,9 @@ modelType = 'ternary';
 % Prior hypothesis probabilities (common prior for each time step)
 switch modelType
     case 'ternary'          
-        P_is	= 0.4;
-        P_pl	= 0.3;
-        P_null	= 0.3; 
+        P_is	= 0.5;
+        P_pl	= 0;
+        P_null	= 0.5; 
     otherwise
         error('Invalid mode');
 end
