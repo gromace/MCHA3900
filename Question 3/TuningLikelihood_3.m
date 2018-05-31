@@ -12,12 +12,12 @@ beq = 1;
 switch modelType
     case 'binary'
     %Constrain overrun and null prior to zero
-    Aeq = [Aeq; zeros(1,8),1,0;zeros(1,9),1]; % TODO
+    Aeq = [Aeq; zeros(1,1),1,0;zeros(1,2),1]; % TODO
     beq = [beq; 0;0];  % TODO
     case 'ternary'
     %Constrain overrun prior to zero
-    Aeq = [Aeq; zeros(1,5)]; % TODO
-    beq = [beq; 0];       % TODO
+    Aeq = [Aeq; zeros(1,5); zeros(1,5)]; % TODO
+    beq = [beq; 0; 1];       % TODO
  end
 
 fmopt = optimoptions('fmincon',...

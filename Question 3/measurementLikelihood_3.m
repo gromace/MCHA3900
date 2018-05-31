@@ -11,8 +11,8 @@ load('Initial_image_pose.mat') %Use for POSE?
 load('calibration_sample_vector_points.mat')
 
 
-p.vec1 = rHCc_norm(:,2);
-p.vec2 = rHCc_norm(:,2);
+p.vec1 = rHCc_norm(:,1);
+p.vec2 = rHCc_norm(:,1);
 
 
 % Lookup idle and part-load exhaust cam maps [deg BTDC] for each time step
@@ -25,8 +25,8 @@ p.max=15;
 
 % Standard deviation of measurement likelihood
 
-sigma_cex_is = 0.5;  % stdev of exhaust cam phase uncertainty
-sigma_cex_pl=0.2;
+sigma_cex_is = 0.1;  % stdev of exhaust cam phase uncertainty
+sigma_cex_pl=0.5;
 
 
 % Uncomment one model type below
@@ -38,12 +38,12 @@ modelType = 'ternary';
 switch modelType
     case 'ternary'          
         P_is	= 0.4;
-        P_pl	= 0.3;
-        P_null	= 0.3; 
+        P_pl	= 0.2;
+        P_null	= 0.4; 
     otherwise
         error('Invalid mode');
 end
-assert(P_is + P_pl + + P_null == 1, 'Prior probabilities must sum to 1');
+assert(P_is + P_pl  + P_null == 1, 'Prior probabilities must sum to 1');
 
 % Pack parameters
 theta = [sigma_cex_is;sigma_cex_pl;P_is;P_pl;P_null];
