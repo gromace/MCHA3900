@@ -12,8 +12,8 @@ beq = 1;
 switch modelType
     case 'ternary'
     %Constrain overrun prior to zero
-    Aeq = [Aeq; 0 0 0 0 0 ]; % TODO
-    beq = [beq; 0];       % TODO
+    Aeq = [Aeq; zeros(1,5);epsilon*ones(1,5) ]; % TODO
+    beq = [beq; 1;1];       % TODO
  end
 
 fmopt = optimoptions('fmincon',...
