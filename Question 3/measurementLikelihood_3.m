@@ -9,7 +9,7 @@ load('Initial_image_pose.mat') %Use for POSE just for random data?
 %POSE=[N E D; theta phi psi; dtheta dphi dpsi];
 
 load('calibration_sample_vector_points.mat')
-N=100;
+N=3;
 p.vc = 0.5*randn(N,1)+1;
 p.vec1 = rHCc_norm(:,1);
 p.vec2 = rHCc_norm(:,2);
@@ -49,15 +49,15 @@ assert(P_is + P_pl  + P_null == 1, 'Prior probabilities must sum to 1');
 theta = [sigma_cex_is;sigma_cex_pl;P_is;P_pl;P_null];
 
 %% Automatic parameter tuning
-p.thetacb= 0.2;
-p.thetanb= 0.2;
-p.vCBb= 0;
-p.vBNb= 0;
-p.omegaBNb= 0 ;
-p.RPNn= [1 0 0;0 1 0;0 0 1];
-p.RBNn= [1 0 0;0 1 0;0 0 1];
+p.thetacb= [atan2(-rHCc_norm(3,1),sqrt((rHCc_norm(1,1))^2+(rHCc_norm(2,1))^2));atan2(rHCc_norm(2,1),rHCc_norm(1,1));0];
+p.thetanb= [0;0;0];
+p.vCBb= ones(3,1);
+p.vBNb= ones(3,1);
+p.omegaBNb= ones(3,1) ;
+p.rPNn= [1 0 0;0 1 0;0 0 1];
+p.rBNn= [1 0 0;0 1 0;0 0 1];
 p.rCbb= [1;1;1];
-p.rQCc= rHCc_norm;
+p.rQCc= rHCc_norm(:,1);
 
 
 % Find optimal parameters
