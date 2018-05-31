@@ -4,6 +4,7 @@ rHCh = [O';zeros(1,length(O))];
 
 ucn_1 = zeros(35,3);
 ustar = zeros(35,3);
+uc = zeros(35,3,num_images);
 ucn = zeros(length(O),3,length(num_images));
 Rch = zeros(3,3,length(num_images));
 rHCc = zeros(3,1,length(num_images));
@@ -21,7 +22,7 @@ for k = 1:num_images
     fz = Fz(imagePoints(:,2,k),imagePoints(:,1,k));
 
     % Vectorize
-    uc = [-fx,fy,fz];
+    uc(:,:,k) = [-fx,fy,fz];
 
     % Normalise the sucker... I mean vector
     uc_norm = sqrt(fx(:).^2 + fy(:).^2 + fz(:).^2);
@@ -47,7 +48,7 @@ for k = 1:num_images
         d(i,k) = 1 - ucn(i,:,k) * rQCc(:,i,k);      
     end
 
-    ustar = ustar + ucn(:,:,k);
+    ustar = ustar + uc(:,:,k);
 end
 
 % NOTE: not sure about the error part here
