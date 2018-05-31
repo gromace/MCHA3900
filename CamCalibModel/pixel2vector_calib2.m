@@ -36,6 +36,7 @@ waitbar(0.3,param.wh); % Update waitbar
 A = [repmat([ones(1,9),inf*ones(1,3)],1,param.k);
     -repmat([ones(1,9),inf*ones(1,3)],1,param.k)];
 B = deg2rad([190;-190]);
+
 options = optimoptions(@fmincon,'MaxFunctionEvaluations',1e6,'Algorithm','sqp', 'PlotFcn',...
                        'optimplotfval','OptimalityTolerance',1e-10,'MaxIterations',200); 
 out = fmincon(@(intc) px2vec2(intc, worldPoints, imagePoints, param.k, Fx, Fy, Fz), intc,...
