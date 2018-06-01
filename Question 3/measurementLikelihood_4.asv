@@ -22,7 +22,7 @@ x = [thetacb;thetanb;vCBb;vBNb;omegaBNb;rPNn;rBNn;rCbb;rQCc];
 for i=1:40
 [yflow(:,i)] = measurementModel2(x);
 end
-clf
+
 figure(1)
 plot3(yflow(1,:),yflow(2,:),yflow(3,:),'x')
 grid on
@@ -31,9 +31,7 @@ xlabel('x') % x-axis label
 ylabel('y') % y-axis label
 zlabel('z')
 vec=rHCc(:,2);
-
-hold on
-plot3(vec(1,1), vec(2,1),vec(3,1),'ok')
-
+figure(2)
+plot3(vec(1,1), vec(2,1),vec(3,1),'-')
 
 
