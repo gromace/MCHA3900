@@ -9,7 +9,7 @@ rPNn = x(16:18);
 rBNn = x(19:21);
 rCbb = x(22:24);
 rQCc = x(25:27);
-vc = [x(27:30),x(31:33),x(34:36)];
+vc = wgn(3,1,1,'linear');
 
 % Rotation matrices 
 Rcb = eulerRotation(thetacb);
