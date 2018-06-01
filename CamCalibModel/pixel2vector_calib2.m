@@ -52,7 +52,7 @@ disp(['simulation run time: ',num2str(toc/60),' mins'])
 
 %% Update grid with optimised Uij* values
 [Fxstar, Fystar, Fzstar] = updateGrid(ustar');
-save('optimized_pixelToVector_lerp_grid.mat','Fxstar', 'Fystar', 'Fzstar');
+% save('optimized_pixelToVector_lerp_grid.mat','Fxstar', 'Fystar', 'Fzstar');
 
 %% How's the waitbar going bois?
 try 
