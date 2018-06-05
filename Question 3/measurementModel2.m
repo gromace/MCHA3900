@@ -29,5 +29,4 @@ dBrPQc = S(rQCc)*[rhoPC*S(rQCc),eye(3)]*[vCNc;omegaBNc];
 % measurement model with additive Gaussian noise
 yflow = dBrPQc + vc;
 
-
 end

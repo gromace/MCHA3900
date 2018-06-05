@@ -1,3 +1,4 @@
+%% skew matrix: S is used instead of skew to avoid tedious typing
 function out = S(in)
 
 % Skew matrix S(u)

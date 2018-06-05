@@ -4,6 +4,7 @@ load('Initial_image_pose.mat') %Use for POSE just for random data?
 %POSE=[N E D; theta phi psi; dtheta dphi dpsi];
 
 load('calibration_sample_vector_points.mat','rHCc_norm')
+load('px2vec_pose.mat')
 N=3;
 
 thetacb = deg2rad([90;90;90]);
@@ -20,10 +21,11 @@ rQCc = rHCc(:,1);
 x = [thetacb;thetanb;vCBb;vBNb;omegaBNb;rPNn;rBNn;rCbb;rQCc];
 
 for i=1:40
-[yflow(:,i)] = measurementModel2(x);
+    yflow(:,i) = measurementModel2(x);
 end
-clf
-figure(1)
+
+%% Plots
+figure(1);clf
 plot3(yflow(1,:),yflow(2,:),yflow(3,:),'x')
 grid on
 title('Flow Vectors')
