@@ -10,47 +10,57 @@ param.wh = waitbar(0,getMsg, ...
     'CreateCancelBtn', 'setappdata(gcbf,''cancelling'',1)');
 %% Calibration
 % Find checkerboard corners
-CheckerboardDetection();
-% CheckerboardDetectionVideo();
+% CheckerboardDetection();
+CheckerboardDetectionVideo();
+
 waitbar(0.25,param.wh); % Update waitbar
-im_num = 2;
+im_num = 2;             % Select frame to plot
 
 fs = 20;
-% worldPoints(:,:) = worldPoints(:,:)*1e-3;
+
 % Number of frames
 param.k = length(imageFileNamesUsed);
 
 % Initial image pose and pixel to vector grid
 load('Initial_image_pose.mat')
 load('pixelToVector_lerp_grid.mat');
+load('pixelToVector_nlerp_grid.mat');
 load('calibration_sample_vector_points.mat')
 
 Ach_est(:,:,1) = Ach_init_est;
 
-% Set the initial pose
-init_pose = [Ach_est(1:3,1);Ach_est(1:3,2);Ach_est(1:3,3);Ach_est(1:3,4)];
+% Set the initial pose: input angles and vector
+% init_pose = [Ach_est(1:3,1);Ach_est(1:3,2);Ach_est(1:3,3);Ach_est(1:3,4)];
+init_pose = [deg2rad([90;-90;90]);Ach_est(1:3,4)];
 intc = repmat(init_pose,param.k,1);
 waitbar(0.3,param.wh); % Update waitbar
 
 %% Run optimization for pixel to vector function
-A = [repmat([ones(1,9),inf*ones(1,3)],1,param.k);
-    -repmat([ones(1,9),inf*ones(1,3)],1,param.k)];
-B = deg2rad([190;-190]);
+lb = -repmat([deg2rad(190)*ones(1,3),inf*ones(1,3)],1,param.k);
+ub = repmat([deg2rad(190)*ones(1,3),inf*ones(1,3)],1,param.k);
 
 options = optimoptions(@fmincon,'MaxFunctionEvaluations',1e6,'Algorithm','sqp', 'PlotFcn',...
-                       'optimplotfval','OptimalityTolerance',1e-10,'MaxIterations',inf); 
-out = fmincon(@(intc) px2vec2(intc, worldPoints, imagePoints, param.k, Fx, Fy, Fz), intc,...
-                               [], [], [], [], [], [], @norm_vect, options);
+                       'optimplotfval','OptimalityTolerance',1e-6,'MaxIterations',inf); 
+[out, fval, foutput] = fmincon(@(intc) px2vec2(intc, worldPoints, imagePoints, param.k, Fx_norm, Fy_norm, Fz_norm), intc,...
+                               [], [], [], [], lb, ub, [], options);
+
+[~, ustar, ~, ~] = px2vec2(out, worldPoints, imagePoints, param.k, Fx_norm, Fy_norm, Fz_norm);
+%% Transformation angle per frame processed
+psi1 = rad2deg(out(1:6:6*param.k));
+theta1 = rad2deg(out(2:6:6*param.k));
+phi1 = rad2deg(out(3:6:6*param.k));
+
 waitbar(0.75,param.wh); % Update waitbar
 
-% Compute the optimised vectors and pose
-[~, ustar, ucn, Ach] = px2vec2(out, worldPoints, imagePoints, param.k, Fx, Fy, Fz);
-ustar = ustar./param.k;
-disp(['simulation run time: ',num2str(toc/60),' mins'])
-
-%% Update grid with optimised Uij values
+%% Update grid with optimised Uij* values
 [Fxstar, Fystar, Fzstar] = updateGrid(ustar');
-save('optimized_pixelToVector_lerp_grid.mat','Fxstar', 'Fystar', 'Fzstar');
+save('optimized_pixelToVector_nlerp_grid.mat','Fxstar', 'Fystar', 'Fzstar');
+
+% Compute the optimised vectors and pose
+[~, ustar, ucn, Ach] = px2vec2(out, worldPoints, imagePoints, param.k, Fxstar, Fystar, Fzstar);
+waitbar(0.85,param.wh); % Update waitbar
+ustar = ustar./param.k;
+disp(['simulation run time: ',num2str(toc/60),' mins','( ',num2str(toc),' seconds)'])
 
 %% How's the waitbar going bois?
 try 
@@ -59,7 +69,6 @@ catch hot_potato
     rethrow(hot_potato); % Someone else's problem now
 end
 waitbar(1,param.wh); % Update waitbar
-close
 delete(param.wh); % Remove waitbar if we complete successfully
 
 %% Plots
@@ -96,17 +105,5 @@ ylabel('c2 (unit)','FontSize',fs)
 zlabel('c3 (unit)','FontSize',fs)
 grid on
 
-% figure('Name',['Calibration Image ',num2str(im_num)],'NumberTitle','off');clf
 figure(46);clf
-imshow(imageFileNames(:,:,:,im_num))
-
-%% Nonlincon
-function [c,ceq] = norm_vect(intc)
-global param
-
-c=[];
-
-for l=1:param.k
-    ceq(12*l-2 : 12*l) = 1 - sqrt(intc(12*l-2).^2 + intc(12*l-1).^2 + intc(12*l).^2);
-end
-end
+imshow(imageFileNames(:,:,:,2))
