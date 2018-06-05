@@ -58,6 +58,6 @@ end
 err_p = sum(d, 2);
 % err = sum(err_p, 1);
 
-err = abs(lsqr(sum(ustar, 2), err_p));
+err = abs(lsqr(sum(ustar, 2)./num_images, err_p));
 
 end
