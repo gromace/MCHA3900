@@ -16,7 +16,7 @@ d = zeros(length(O),length(num_images));
 
 for k = 1:num_images
     
-    % px2vect/lerp LUT
+    % pixel2vector/lerp LUT
     fx = Fx(imagePoints(:,2,k),imagePoints(:,1,k));
     fy = Fy(imagePoints(:,2,k),imagePoints(:,1,k));
     fz = Fz(imagePoints(:,2,k),imagePoints(:,1,k));
@@ -30,8 +30,10 @@ for k = 1:num_images
     ucn(:,:,k) = [uc(:,1)./uc_norm, uc(:,2)./uc_norm, uc(:,3)./uc_norm];                     % 35 x 3
     
     % Rotation and direction vector in camera coordinates
-    Rch(:,:,k)  = [in(12*(k)-11 : 12*(k)-9), in(12*(k)-8 : 12*(k) - 6),in(12*(k)-5 : 12*(k)-3)];
-    rHCc(:,:,k)  = in(12*(k)-2 : 12*(k));
+    Rch(:,:,k) = eulerRotation(in(6*k - 5:6*k - 3));
+    rHCc(:,:,k)  = in(6*k - 2:6*k);
+%     Rch(:,:,k)  = [in(12*(k)-11 : 12*(k)-9), in(12*(k)-8 : 12*(k) - 6),in(12*(k)-5 : 12*(k)-3)];
+%     rHCc(:,:,k)  = in(12*(k)-2 : 12*(k));
 
     % Pose estimate
     Ach(:,:,k) =[Rch(:,:,k),rHCc(:,:,k);zeros(1,3),1];

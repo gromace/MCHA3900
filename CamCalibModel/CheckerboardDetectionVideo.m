@@ -2,6 +2,8 @@
 V = VideoReader('Cam_Video_15frames.m4v');
 V.CurrentTime = 251/V.FrameRate;
 
+% Sample 31 frames: this number can be varied depending on how much time
+% you want to spend calibrating
 x = 1:50:1726;
 
 i = 1; j = 1;
@@ -19,5 +21,5 @@ end
 imageFileNamesUsed = imageFileNames(imagesUsed);
 
 % Generate world coordinates of the corners of the squares
-squareSize = 0.0285;  % in units of 'meters'
+squareSize = 0.0285;  % in units of 'metres'
 worldPoints = generateCheckerboardPoints(boardSize, squareSize);

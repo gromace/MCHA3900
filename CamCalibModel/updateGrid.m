@@ -2,7 +2,6 @@ function [Fxstar, Fystar, Fzstar] = updateGrid(ustar)
 %% Grid Sample Generation
 ImageGridCol = 7;       % x-direction propagation
 ImageGridRow = 5;       % y-direction propagation
-n = 1;
 
 start = 400;
 finish = 860;

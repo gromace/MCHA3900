@@ -5,7 +5,7 @@ psi1 = [0;0;in(1)];
 theta1 = [0;in(2);0];
 psi2 = [0;0;in(3)];
 
-% Pixel Distances
+% Corner Distances
 Hx = in(4);
 Hy = in(5);
 lH11Cx = in(6);
@@ -35,7 +35,8 @@ Norm_rHCc = sqrt(rHCc(1).^2 + rHCc(2).^2 + rHCc(3).^2);
 
 rHCc_norm = [rHCc(1)./Norm_rHCc;rHCc(2)./Norm_rHCc;rHCc(3)./Norm_rHCc];
 
-% Homogeneous Transformation 
+% Homogeneous Transformation:  
 Ach = [Rch,rHCc;zeros(1,3),1];
 
+% Normalised
 Ach_norm = [Rch,rHCc_norm;zeros(1,3),1];

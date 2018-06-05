@@ -17,7 +17,7 @@ waitbar(0.25,param.wh); % Update waitbar
 im_num = 2;             % Select frame to plot
 
 fs = 20;
-% worldPoints(:,:) = worldPoints(:,:)*1e-3;
+
 % Number of frames
 param.k = length(imageFileNamesUsed);
 
@@ -29,30 +29,38 @@ load('calibration_sample_vector_points.mat')
 
 Ach_est(:,:,1) = Ach_init_est;
 
-% Set the initial pose
-init_pose = [Ach_est(1:3,1);Ach_est(1:3,2);Ach_est(1:3,3);Ach_est(1:3,4)];
+% Set the initial pose: input angles and vector
+% init_pose = [Ach_est(1:3,1);Ach_est(1:3,2);Ach_est(1:3,3);Ach_est(1:3,4)];
+init_pose = [deg2rad([90;-90;90]);Ach_est(1:3,4)];
 intc = repmat(init_pose,param.k,1);
 waitbar(0.3,param.wh); % Update waitbar
 
 %% Run optimization for pixel to vector function
-A = [repmat([ones(1,9),inf*ones(1,3)],1,param.k);
-    -repmat([ones(1,9),inf*ones(1,3)],1,param.k)];
-B = deg2rad([190;-190]);
+lb = -repmat([deg2rad(190)*ones(1,3),inf*ones(1,3)],1,param.k);
+ub = repmat([deg2rad(190)*ones(1,3),inf*ones(1,3)],1,param.k);
 
 options = optimoptions(@fmincon,'MaxFunctionEvaluations',1e6,'Algorithm','sqp', 'PlotFcn',...
                        'optimplotfval','OptimalityTolerance',1e-6,'MaxIterations',inf); 
 [out, fval, foutput] = fmincon(@(intc) px2vec2(intc, worldPoints, imagePoints, param.k, Fx_norm, Fy_norm, Fz_norm), intc,...
-                               [], [], [], [], [], [], [], options);
-waitbar(0.75,param.wh); % Update waitbar
+                               [], [], [], [], lb, ub, [], options);
 
-% Compute the optimised vectors and pose
-[~, ustar, ucn, Ach] = px2vec2(out, worldPoints, imagePoints, param.k, Fx, Fy, Fz);
-ustar = ustar./param.k;
-disp(['simulation run time: ',num2str(toc/60),' mins'])
+[~, ustar, ~, ~] = px2vec2(out, worldPoints, imagePoints, param.k, Fx_norm, Fy_norm, Fz_norm);
+%% Transformation angle per frame processed
+psi1 = rad2deg(out(1:6:6*param.k));
+theta1 = rad2deg(out(2:6:6*param.k));
+phi1 = rad2deg(out(3:6:6*param.k));
+
+waitbar(0.75,param.wh); % Update waitbar
 
 %% Update grid with optimised Uij* values
 [Fxstar, Fystar, Fzstar] = updateGrid(ustar');
-% save('optimized_pixelToVector_lerp_grid.mat','Fxstar', 'Fystar', 'Fzstar');
+save('optimized_pixelToVector_nlerp_grid.mat','Fxstar', 'Fystar', 'Fzstar');
+
+% Compute the optimised vectors and pose
+[~, ustar, ucn, Ach] = px2vec2(out, worldPoints, imagePoints, param.k, Fxstar, Fystar, Fzstar);
+waitbar(0.85,param.wh); % Update waitbar
+ustar = ustar./param.k;
+disp(['simulation run time: ',num2str(toc/60),' mins','( ',num2str(toc),' seconds)'])
 
 %% How's the waitbar going bois?
 try 
@@ -61,7 +69,6 @@ catch hot_potato
     rethrow(hot_potato); % Someone else's problem now
 end
 waitbar(1,param.wh); % Update waitbar
-close
 delete(param.wh); % Remove waitbar if we complete successfully
 
 %% Plots
