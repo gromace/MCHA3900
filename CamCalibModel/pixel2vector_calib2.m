@@ -1,5 +1,5 @@
 %% Initialisation
-clear all;clc
+% clear all;clc
 global param
 tic
 %% Waitbar
@@ -8,13 +8,26 @@ delete(findall(0,'tag','TMWWaitbar'));
 param.wh = waitbar(0,getMsg, ...
     'Name', 'MCHA3900 Project', ...
     'CreateCancelBtn', 'setappdata(gcbf,''cancelling'',1)');
+%% Grid Sample Generation
+ImageGridCol = 7;       % x-direction propagation
+ImageGridRow = 5;       % y-direction propagation
+
+start = 400;
+finish = 860;
+
+xstep = (finish - start)/ImageGridRow;
+ystep = (finish - start)/ImageGridCol;
+
+u = start:xstep:finish-1;
+v = start:ystep:finish-1;
+
 %% Calibration
 % Find checkerboard corners
 % CheckerboardDetection();
-CheckerboardDetectionVideo();
+% CheckerboardDetectionVideo();
 
 waitbar(0.25,param.wh); % Update waitbar
-im_num = 2;             % Select frame to plot
+im_num = 1;             % Select frame to plot
 
 fs = 20;
 
@@ -33,18 +46,22 @@ Ach_est(:,:,1) = Ach_init_est;
 % init_pose = [Ach_est(1:3,1);Ach_est(1:3,2);Ach_est(1:3,3);Ach_est(1:3,4)];
 init_pose = [deg2rad([90;-90;90]);Ach_est(1:3,4)];
 intc = repmat(init_pose,param.k,1);
+intc2 = [repmat(init_pose,param.k,1);rHCc(1,:)';rHCc(2,:)';rHCc(3,:)'];
 waitbar(0.3,param.wh); % Update waitbar
 
 %% Run optimization for pixel to vector function
-lb = -repmat([deg2rad(190)*ones(1,3),inf*ones(1,3)],1,param.k);
-ub = repmat([deg2rad(190)*ones(1,3),inf*ones(1,3)],1,param.k);
+lb = -[repmat([deg2rad(95)*ones(1,3),inf*ones(1,3)],1,param.k),inf*ones(1,105)];
+ub = [repmat([deg2rad(95)*ones(1,3),inf*ones(1,3)],1,param.k),inf*ones(1,105)];
 
 options = optimoptions(@fmincon,'MaxFunctionEvaluations',1e6,'Algorithm','sqp', 'PlotFcn',...
                        'optimplotfval','OptimalityTolerance',1e-6,'MaxIterations',inf); 
-[out, fval, foutput] = fmincon(@(intc) px2vec2(intc, worldPoints, imagePoints, param.k, Fx_norm, Fy_norm, Fz_norm), intc,...
-                               [], [], [], [], lb, ub, [], options);
+% [out, fval, foutput] = fmincon(@(intc) px2vec2(intc, worldPoints, imagePoints, param.k, Fx_norm, Fy_norm, Fz_norm), intc,...
+%                                [], [], [], [], lb, ub, [], options);
+[out, fval, foutput] = fmincon(@(intc2) px2vec3(intc2, worldPoints, imagePoints, param.k, u, v), intc2,...
+                               [], [], [], [], lb, ub, @norm_vect, options);
 
-[~, ustar, ~, ~] = px2vec2(out, worldPoints, imagePoints, param.k, Fx_norm, Fy_norm, Fz_norm);
+% [~, ustar, ~, ~] = px2vec2(out, worldPoints, imagePoints, param.k, Fx_norm, Fy_norm, Fz_norm);
+[~, ustar, ~, ~] = px2vec3(out, worldPoints, imagePoints, param.k, u, v);
 %% Transformation angle per frame processed
 psi1 = rad2deg(out(1:6:6*param.k));
 theta1 = rad2deg(out(2:6:6*param.k));
@@ -54,10 +71,11 @@ waitbar(0.75,param.wh); % Update waitbar
 
 %% Update grid with optimised Uij* values
 [Fxstar, Fystar, Fzstar] = updateGrid(ustar');
-save('optimized_pixelToVector_nlerp_grid.mat','Fxstar', 'Fystar', 'Fzstar');
+% save('optimized_pixelToVector_nlerp_grid.mat','Fxstar', 'Fystar', 'Fzstar');
 
 % Compute the optimised vectors and pose
-[~, ustar, ucn, Ach] = px2vec2(out, worldPoints, imagePoints, param.k, Fxstar, Fystar, Fzstar);
+% [~, ustar, ucn, Ach] = px2vec2(out, worldPoints, imagePoints, param.k, Fxstar, Fystar, Fzstar);
+[~, ustar, ucn, Ach] = px2vec3(out, worldPoints, imagePoints, param.k, u, v);
 waitbar(0.85,param.wh); % Update waitbar
 ustar = ustar./param.k;
 disp(['simulation run time: ',num2str(toc/60),' mins','( ',num2str(toc),' seconds)'])
