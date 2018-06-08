@@ -74,15 +74,16 @@ for j=1:length(worldPoints)
 end;clear j
 text(0,0,0,'CamOrigin')
 text(-rHCc_norm(1,:),rHCc_norm(2,:),rHCc_norm(3,:),strnum);
-legend('pixeltovec (u^{c}_{ij})','measured r_{H_{ij}/C}^{c}')
-xlabel('c1 (m)','FontSize',fs)
-ylabel('c2 (m)','FontSize',fs)
-zlabel('c3 (m)','FontSize',fs)
+title('Normalised Camera view r_{Q_{ij}/C}^{c}','FontSize',fs)
+% legend('pixeltovec (u^{c}_{ij})','measured r_{H_{ij}/C}^{c}')
+xlabel('c1 (unit)','FontSize',fs)
+ylabel('c2 (unit)','FontSize',fs)
+zlabel('c3 (unit)','FontSize',fs)
 grid on
 
 figure(3);clf
 % plot3(rHCc(1,:),rHCc(2,:),rHCc(3,:),'r+',0,0,0,'r+',rHCc_tuned(1,:),rHCc_tuned(2,:),rHCc_tuned(3,:),'b+')
-plot3(-rHCc(1,:),rHCc(2,:),rHCc(3,:),'r+',0,0,0,'r+')
+plot3(-rHCc(1,:),rHCc(2,:),rHCc(3,:),'r+-',0,0,0,'r+')
 text(0,0,0,'CameraOrigin')
 view(-145,-45)
 for j=1:length(worldPoints)
@@ -91,9 +92,9 @@ end;clear j
 text(-rHCc(1,:),rHCc(2,:),rHCc(3,:),strnum);
 % text(rHCc_tuned(1,:),rHCc_tuned(2,:),rHCc_tuned(3,:),strnum);clear strnum
 title('distance from cam to corner from cam perspective r_{H_{ij}/C}^{c}','FontSize',fs)
-xlabel('c1 (unit)','FontSize',fs)
-ylabel('c2 (unit)','FontSize',fs)
-zlabel('c3 (unit)','FontSize',fs)
+xlabel('c1 (m)','FontSize',fs)
+ylabel('c2 (m)','FontSize',fs)
+zlabel('c3 (m)','FontSize',fs)
 grid on
 
 % figure(5);clf

@@ -40,7 +40,7 @@ for k = 1:num_images
     fz = Fz(imagePoints(:,2,k),imagePoints(:,1,k));
 
     % Vectorize
-    uc(:,:,k) = [-fx,fy,fz];
+    uc(:,:,k) = [fx,fy,fz];
 %     ucn(:,:,k) = [-fx,fy,fz];
     
     % Normalise 
@@ -61,6 +61,8 @@ for k = 1:num_images
     norm_rPCc = sqrt(rPCc(1,:,k).^2 + rPCc(2,:,k).^2 + rPCc(3,:,k).^2);
     rQCc(:,:,k) = [rPCc(1,:,k)./norm_rPCc; rPCc(2,:,k)./norm_rPCc; rPCc(3,:,k)./norm_rPCc];        % 3 x 35
     
+
+    
     % Compute angular error
     for i=1:length(O)
 %         d(i,k) = 1 - ucn(i,:,k) * rQCc(:,i,k);
@@ -69,14 +71,20 @@ for k = 1:num_images
     
     % Update map
 %     ustar = ustar + ucn(:,:,k);
-    ustar = ustar + uc(:,:,k);
+%     ustar = ustar + uc(:,:,k);
+     
     
 end
+
+% Update map
+ustar = [in(6*num_images+1:6*num_images+35),in(6*num_images + 36:6*num_images+70),in(6*num_images+71:6*num_images+105)];
 
 % NOTE: not sure about the error part here
 err_p = sum(d, 2);
 err = abs(sum(err_p, 1));
 % err = lsqr(err_p, ones(length(O),1));
+
+% err = immse(ustar', sum(rQCc, 3));
 
 % err = abs(lsqr(sum(ustar, 2)./num_images, err_p));
 
