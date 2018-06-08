@@ -1,49 +1,52 @@
 # README
 
-# Main Scripts used for pixel to vector and vice versa
-1) `pixel2vector_calib2.m`
-2) `Vector2pixel`
-3) `CamCalib`
+## Camera Calibration: ##
+Run `pixel2vector_calib2.m` to calibrate and output the optimised pose, `Ach` should be visible in the workspace. You can calibrate images 
+or a video but need to select between `CheckerboardDetection` or `CheckerboardDetectionVideo`. 
 
+### Main Scripts used for pixel to vector and vice versa ###
+* `pixel2vector_calib2.m`
+* `Vector2pixel.m`
+* `CamCalib.m`
 
-# Script operational order
-`pixel2vector_calib2` script 
- 1) Pixel 2 vector function uses `CheckerboardDetection` or `CheckerboardDetectionVideo` function (image and/or video) to process ImagePoints in pixel coordintates
- 2) The normalised Vectors are assigned to `mat` files as `...nlerp...` and `...lerp...`
- 3) These mat files along with sample pixels are used to create LUT using `griddedInterpolant` function using 1 image.
- 4) An initial pose was placed and `repmat` though based on the number of frames
- 5) Inputs to `fmincon` include Initial vectors, euler angles and griddedinterpolant vectors to be calibrated.
- 6) Constraints
- 	- Normalise Ustar (Interpolation grid vectors to be unit vectors) done by `norm-vect` function script
- 	- z coordintate (camera to world distace) z>=0
- 	- Angles: -95<psi,theta,phi<95
- 7) LUT gets updated with `Ustar` using `updateGrid` and saved to`.mat` file
+### Script operational order ###
+# `pixel2vector_calib2.m` #
+* Pixel 2 vector function uses `CheckerboardDetection` or `CheckerboardDetectionVideo` function (image and/or video) to process ImagePoints in pixel coordintates
+* The normalised Vectors are assigned to `mat` files as `...nlerp...` and `...lerp...`
+* These mat files along with sample pixels are used to create LUT using `griddedInterpolant` function using 1 image.
+* An initial pose was placed and `repmat` though based on the number of frames
+* Inputs to `fmincon` include Initial vectors, euler angles and griddedinterpolant vectors to be calibrated.
+* Constraints
+ 	* Normalise Ustar (Interpolation grid vectors to be unit vectors) done by `norm-vect` function script
+ 	* z coordintate (camera to world distace) z>=0
+ 	* Angles: -95<psi,theta,phi<95
+* LUT gets updated with `Ustar` using `updateGrid` and saved to`.mat` file
  
- `Vector2pixel` script
- 1) input known vectors in space and an initial guess for pixels as input
- 2) constraints
- 	- Pmin<P<Pmax
- 	- 0 < theta < 180 degress
- 	- 1 - u*pixel2vector <= theta
- 3) use `fmincon` to calculate actual pixels given vectors
+# `Vector2pixel.m` #
+ * input known vectors in space and an initial guess for pixels as input
+ * constraints
+ 	* Pmin<P<Pmax
+ 	* 0 < theta < 180 degress
+ 	* 1 - u*pixel2vector <= theta
+ * use `fmincon` to calculate actual pixels given vectors
 
-`px2vec3` function script
-1) Inputs to be optimised are the 
-	- grid vectors
-	- x,y,z components of Vector (pose)
-	- psi, theta, phi Euler angles (pose)
-2) Cost function is the d(u,v) = 1 - p2v_lerp(p,uij)*rQCc
-   sum of d(u,v)
-3) Optimised grid is outputted
+# `CamCalib.m` #
+* uses the `ForwardKinamticModel` to calcualte the pose given the measured distances from camera to checkerboard
+* Plots normalised Vectors and camera and checkboard in space
 
-`px2vec2` function script
-1) Uses lqsr as cost function
-2) Grid is averaged 
-3) interpolates from grid and normalises it and compares pose derived vectors
+# `px2vec3.m` #
+* Inputs to be optimised are 
+	* grid vectors
+	* x,y,z components of Vector (pose)
+	* psi, theta, phi Euler angles (pose)
+* Cost function is the d(u,v) = 1 - p2v_lerp(p,uij)*rQCc. 
+* sum of d(u,v)
+* Optimised grid is outputted
 
- `CamCalib` script
- 1) uses the `ForwardKinamticModel` to calcualte the pose given the measured distances from camera to checkerboard
- 2) Plots normalised Vectors and camera and checkboard in space
+# `px2vec2`  #
+* Uses lqsr as cost function
+* Grid is averaged 
+* interpolates from grid and normalises it and compares pose derived vectors
 
-`forwardkinamaticModel` function script
-1) calculates the vector defining the normalised camera distance to checkerboard
+# `forwardkinamaticModel` #
+* calculates the vector defining the normalised camera distance to checkerboard
