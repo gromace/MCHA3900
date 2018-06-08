@@ -1,12 +1,8 @@
 %% Load Data
 % Vector Test Data
 clear
-load('Initial_image_pose.mat') %Use for POSE just for random data? 
-%POSE=[N E D; theta phi psi; dtheta dphi dpsi];
 
 load('rHCc_and_norm.mat')
-load('calibration_sample_vector_points.mat')
-load('px2vec_pose.mat')
 N=3;
 
 thetacb = deg2rad([90;90;90]);
