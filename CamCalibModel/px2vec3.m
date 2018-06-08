@@ -1,12 +1,11 @@
 function [err, ustar, uc, Ach] = px2vec3(in, O, imagePoints, num_images, u, v)
 ImageGridCol = 7;       % x-direction propagation
 ImageGridRow = 5;       % y-direction propagation
+
 % Constant World points on checkerboard
 rHCh = [O';zeros(1,length(O))];
 
 % Initialise all the matrices to be filled
-ustar = zeros(35,3);
-% uc = zeros(35,3,num_images);
 uc = zeros(length(O),3,length(num_images));
 Rch = zeros(3,3,length(num_images));
 rHCc = zeros(3,1,length(num_images));
@@ -16,6 +15,7 @@ rPCc = zeros(3,length(O),length(num_images));
 rQCc = zeros(3,length(O),length(num_images));
 d = zeros(length(O),length(num_images));
 
+% Initialise Lerp grid
 rx = ones(ImageGridRow,ImageGridCol);
 ry = ones(ImageGridRow,ImageGridCol);
 rz = ones(ImageGridRow,ImageGridCol);
@@ -28,7 +28,7 @@ for i=1:ImageGridRow
     end
 end
 
-% pixel2vector/lerp LUT
+% pixel2vector/lerp LUT to be updated
 Fx = griddedInterpolant({u,v},rx,'linear','nearest');
 Fy = griddedInterpolant({u,v},ry,'linear','nearest');
 Fz = griddedInterpolant({u,v},rz,'linear','nearest');
@@ -41,11 +41,6 @@ for k = 1:num_images
 
     % Vectorize
     uc(:,:,k) = [fx,fy,fz];
-%     ucn(:,:,k) = [-fx,fy,fz];
-    
-    % Normalise 
-%     uc_norm = sqrt(fx(:).^2 + fy(:).^2 + fz(:).^2);
-%     ucn(:,:,k) = [uc(:,1)./uc_norm, uc(:,2)./uc_norm, uc(:,3)./uc_norm];                     % 35 x 3
     
     % Rotation and direction vector in camera coordinates
     Rch(:,:,k) = eulerRotation(in(6*k - 5:6*k - 3));
@@ -60,18 +55,11 @@ for k = 1:num_images
     % Normalise predicted vectors
     norm_rPCc = sqrt(rPCc(1,:,k).^2 + rPCc(2,:,k).^2 + rPCc(3,:,k).^2);
     rQCc(:,:,k) = [rPCc(1,:,k)./norm_rPCc; rPCc(2,:,k)./norm_rPCc; rPCc(3,:,k)./norm_rPCc];        % 3 x 35
-    
 
-    
     % Compute angular error
     for i=1:length(O)
-%         d(i,k) = 1 - ucn(i,:,k) * rQCc(:,i,k);
         d(i,k) = 1 - uc(i,:,k) * rQCc(:,i,k);
     end
-    
-    % Update map
-%     ustar = ustar + ucn(:,:,k);
-%     ustar = ustar + uc(:,:,k);
      
     
 end
@@ -79,7 +67,7 @@ end
 % Update map
 ustar = [in(6*num_images+1:6*num_images+35),in(6*num_images + 36:6*num_images+70),in(6*num_images+71:6*num_images+105)];
 
-% NOTE: not sure about the error part here
+% Cost Function
 err_p = sum(d, 2);
 err = abs(sum(err_p, 1));
 % err = lsqr(err_p, ones(length(O),1));

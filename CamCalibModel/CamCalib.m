@@ -62,7 +62,6 @@ catch hot_potato
     rethrow(hot_potato); % Someone else's problem now
 end
 waitbar(1,wh); % Update waitbar
-close
 delete(wh); % Remove waitbar if we complete successfully
 
 %% Plots
@@ -96,12 +95,3 @@ xlabel('c1 (m)','FontSize',fs)
 ylabel('c2 (m)','FontSize',fs)
 zlabel('c3 (m)','FontSize',fs)
 grid on
-
-% figure(5);clf
-% plot3(rHCc_est(1,:),rHCc_est(2,:),rHCc_est(3,:),'rx-')
-% for j=1:length(worldPoints)
-%     strnum(j) = {['',num2str(j)]};
-% end;clear 
-% text(rHCc_est(1,:),rHCc_est(2,:),rHCc_est(3,:),strnum);
-% legend('est','actual')
-% grid on
