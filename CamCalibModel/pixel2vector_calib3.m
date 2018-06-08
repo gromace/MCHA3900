@@ -43,9 +43,7 @@ load('calibration_sample_vector_points.mat')
 Ach_est(:,:,1) = Ach_init_est;
 
 % Set the initial pose: input angles and vector
-% init_pose = [Ach_est(1:3,1);Ach_est(1:3,2);Ach_est(1:3,3);Ach_est(1:3,4)];
 init_pose = [deg2rad([90;-90;90]);Ach_est(1:3,4)];
-intc = repmat(init_pose,param.k,1);
 intc2 = [repmat(init_pose,param.k,1);rHCc(1,:)';rHCc(2,:)';rHCc(3,:)'];
 waitbar(0.3,param.wh); % Update waitbar
 
@@ -55,12 +53,10 @@ ub = [repmat([deg2rad(95)*ones(1,3),inf*ones(1,3)],1,param.k),inf*ones(1,105)];
 
 options = optimoptions(@fmincon,'MaxFunctionEvaluations',1e6,'Algorithm','sqp', 'PlotFcn',...
                        'optimplotfval','OptimalityTolerance',1e-10,'MaxIterations',500); 
-% [out, fval, foutput] = fmincon(@(intc) px2vec2(intc, worldPoints, imagePoints, param.k, Fx_norm, Fy_norm, Fz_norm), intc,...
-%                                [], [], [], [], lb, ub, [], options);
+
 [out, fval, foutput] = fmincon(@(intc2) px2vec3(intc2, worldPoints, imagePoints, param.k, u, v), intc2,...
                                [], [], [], [], lb, ub, @norm_vect, options);
 
-% [~, ustar, ~, ~] = px2vec2(out, worldPoints, imagePoints, param.k, Fx_norm, Fy_norm, Fz_norm);
 [~, ustar, ~, ~] = px2vec3(out, worldPoints, imagePoints, param.k, u, v);
 %% Transformation angle per frame processed
 psi1 = rad2deg(out(1:6:6*param.k));
@@ -76,10 +72,10 @@ for i=1:param.k
     ucn(:,:,i) = [Fxstar(imagePoints(:,1,i),imagePoints(:,2,i)),Fystar(imagePoints(:,1,i),imagePoints(:,2,i)),Fzstar(imagePoints(:,1,i),imagePoints(:,2,i))];
 end
 % Compute the optimised vectors and pose
-% [~, ustar, ucn, Ach] = px2vec2(out, worldPoints, imagePoints, param.k, Fxstar, Fystar, Fzstar);
 [~, ustar, ~, Ach] = px2vec3(out, worldPoints, imagePoints, param.k, u, v);
 waitbar(0.85,param.wh); % Update waitbar
 ustar = ustar./param.k;
+
 disp(['simulation run time: ',num2str(toc/60),' mins','( ',num2str(toc),' seconds)'])
 
 %% How's the waitbar going bois?
@@ -95,7 +91,6 @@ delete(param.wh); % Remove waitbar if we complete successfully
 figure(44);clf
 for i=im_num
     plot3(0,0,0,'o',ucn(:,1,i),ucn(:,2,i),ucn(:,3,i),'x-')
-    % view(0,90)
     for j=1:length(worldPoints)
         strnum(j) = {['',num2str(j)]};
     end;clear j
@@ -104,7 +99,6 @@ for i=im_num
     hold on
 end
 title(['Frame ',num2str(im_num)],'FontSize',fs)
-% legend('pixeltovec (u^{c}_{ij})','measured r_{H_{ij}/C}^{c}')
 xlabel('c1 (unit)','FontSize',fs)
 ylabel('c2 (unit)','FontSize',fs)
 zlabel('c3 (unit)','FontSize',fs)
