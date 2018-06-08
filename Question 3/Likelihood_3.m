@@ -26,7 +26,7 @@ o.lik_dB_is   =  lik_dB_cex_is ;
 o.lik_dB_pl   =  lik_dB_cex_pl ; 
 o.lik_dB_null = lik_dB_cex_null ;
 
-lik_dB_all    = [o.lik_dB_is, o.lik_dB_pl, o.lik_dB_null];
+lik_dB_all    = [o.lik_dB_is, o.lik_dB_pl, o.lik_dB_null]';
 P_all         = [P_gb, P_ob, P_null];
 
 if nargout >= 2

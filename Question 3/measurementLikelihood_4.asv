@@ -1,6 +1,5 @@
 %% Load Data
 % Vector Test Data
-clear
 load('Initial_image_pose.mat') %Use for POSE just for random data? 
 %POSE=[N E D; theta phi psi; dtheta dphi dpsi];
 
@@ -19,6 +18,7 @@ rBNn = [0.05;-0.05;-0.05];
 rCbb = [0.025;0.025;0.025];
 rQCc = rHCc(:,1);
 
+%% Measurement Model
 % Uncomment one model type below
 %modelType = 'binary';
 modelType = 'ternary';
@@ -27,23 +27,22 @@ modelType = 'ternary';
 % Prior hypothesis probabilities (common prior for each time step)
 switch modelType
     case 'ternary'          
-        P_gb	= 0.4;
+        P_gb	= 0.3;
         P_ob	= 0.4;
-        P_null	= 0.2; 
+        P_null	= 0.3; 
     otherwise
         error('Invalid mode');
 end
 assert(P_gb + P_ob  + P_null == 1, 'Prior probabilities must sum to 1');
 
-
+for i=1:100
 x = [thetacb;thetanb;vCBb;vBNb;omegaBNb;rPNn;rBNn;rCbb;rQCc];
 
-for i=1:35
+for i=1:40
     yflow(:,i) = measurementModel2(x);
 end
 
 
-%% Measurement Model
 p.vec1 = rHCc(:,1);
 p.vec2 = yflow(:,1);
 
@@ -58,7 +57,7 @@ p.max=1;
 
 % Standard deviation of measurement likelihood
 
-sigma_gb = 0.1;  
+sigma_gb = 0.3;  
 sigma_ob = 0.1;
 
 
@@ -71,18 +70,8 @@ theta = [sigma_gb;sigma_ob;P_gb;P_ob;P_null];
 % Pack parameters (Initial guess)
 
 
-
-% Unpack results
-sigma_gb     = x(1);
-sigma_ob     = x(2);
-P_gb         = x(3);
-P_ob         = x(4);
-P_null       = x(5);
-
-
 % Find optimal parameters
 theta = TuningLikelihood_3(theta, modelType, p);
-
 %% Plots
 figure(2);
 plot3(yflow(1,:),yflow(2,:),yflow(3,:),'x')
